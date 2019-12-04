@@ -2,6 +2,7 @@ from __future__ import print_function, unicode_literals
 from PyInquirer import style_from_dict, Token, prompt, Separator
 from PyInquirer import Validator, ValidationError
 import regex
+import json
 
 class emailValidator(Validator):
     def validate(self, document):
@@ -34,10 +35,18 @@ def install():
         {
             'type': 'password',
             'message': 'Ingresa tu contraseña para siempre iniciar sesion',
-            'name': 'password',
+            'name': 'passw',
             'validate': passValidator
         }
     ]
     answers = prompt(questions)
+    data = {}
+    data['user'] = []
+    data['user'].append({
+        'correo': answers['correo'],
+        'psw': answers['passw']
+    })
+    with open ('config.json', 'w') as file:
+        json.dump(data, file, indent=2)
     #falta crear el archivo json
     print('instalando...')
