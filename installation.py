@@ -3,6 +3,7 @@ from PyInquirer import style_from_dict, Token, prompt, Separator
 from PyInquirer import Validator, ValidationError
 import regex
 import json
+import main
 
 class emailValidator(Validator):
     def validate(self, document):
@@ -48,5 +49,5 @@ def install():
     })
     with open ('config.json', 'w') as file:
         json.dump(data, file, indent=2)
-    #falta crear el archivo json
+    main.main()
     print('instalando...')
