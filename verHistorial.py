@@ -11,27 +11,30 @@ def Nombres(answers):
     return nombres
 
 def verHistorial():
-    questions = [
-        {
-            'type': 'list',
-            'name': 'choices',
-            'message': 'selecciona el historial de alguno de los nombres',
-            'choices': Nombres
-        },
-    ]
-    answers = prompt(questions)
     with open('historial.json') as file:
         data = json.load(file)
-        names = []
-        for nombre in data['historial']:
-            names.append({
-                "name": nombre['name'],
-                "historial": nombre['historial']
-            })
-        mostrar = []
-        for x in range(0,len(names)):
-            if(names[x]['name'] == answers['choices']):
-                num = 1
-                for contra in names[x]['historial']:
-                    print(str(num)+". "+contra['psw'])
-                    num=num+1
+    if(not data['historial'] == []):
+        questions = [
+            {
+                'type': 'list',
+                'name': 'choices',
+                'message': 'selecciona el historial de alguno de los nombres',
+                'choices': Nombres
+            },
+        ]
+        answers = prompt(questions)
+        with open('historial.json') as file:
+            data = json.load(file)
+            names = []
+            for nombre in data['historial']:
+                names.append({
+                    "name": nombre['name'],
+                    "historial": nombre['historial']
+                })
+            mostrar = []
+            for x in range(0,len(names)):
+                if(names[x]['name'] == answers['choices']):
+                    num = 1
+                    for contra in names[x]['historial']:
+                        print(str(num)+". "+contra['psw'])
+                        num=num+1
