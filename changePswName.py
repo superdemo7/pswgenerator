@@ -104,3 +104,5 @@ def changeName():
         json.dump(data, file, indent=2)
 
     uploadPswd(anteriorPswd, answers['choices'])
+
+changeName()
