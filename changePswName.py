@@ -1,22 +1,26 @@
 from PyInquirer import style_from_dict, Token, prompt, Separator
 from PyInquirer import Validator, ValidationError
+import json
 
 class validateNew(Validator):
     def validate(self, document):
         newName = len(document.text)
         if not newName > 0:
             raise ValidationError(
-                message='El nuevo nombre no puede estar vacio',
+                message='la nueva contraseña no puede estar vacia',
                 cursor_position=len(document.text))
         if newName > 21:
             raise ValidationError(
-                message='El nuevo nombre es muy largo',
+                message='la nueva contraseña esta muy larga',
                 cursor_position=len(document.text))
 
 def Nombres(answers):
-    #buscar todos los nombres del archivo json y meterlos a un arreglo
-    nombres = ['PSW', 'mi favorita', 'la nueva', 'Imposible']
-    arregloNombres = nombres
+    #cambiar por el nombre del json
+    with open('passwords.json') as file:
+        data = json.load(file)
+        nombres = []
+        for user in data['passwords']:
+            nombres.append(user['name'])
     return nombres
 
 def changeName():
@@ -24,23 +28,34 @@ def changeName():
         {
             'type': 'list',
             'name': 'choices',
-            'message': 'Elige el nombre a cambiar',
+            'message': 'Elige el nombre para cambiar su contraseña',
             'choices': Nombres
         },
         {
-            'type': 'input',
+            'type': 'password',
             'name': 'newName',
-            'message': 'Introduce el nuevo nombre',
+            'message': 'Introduce la nueva contraseña',
             'validate': validateNew
         }
     ]
     answers = prompt(questions)
-    #volver a agarrar los nombres del archivo json y meterlos a un arreglo
-    nombres = ['PSW', 'mi favorita', 'la nueva', 'Imposible']
+    #cambiar por el nombre del json
+    with open('passwords.json') as file:
+        data = json.load(file)
+        nombres = []
+        for user in data['passwords']:
+            nombres.append(
+                {
+                    "nombre": user['name'], 
+                    "contra": user['psw']
+                })
+
     for x in range(0,len(nombres)):
-        if(nombres[x] == answers['choices']):
-            nombres[x] = answers['newName']
+        nombre = nombres[x].get('nombre')
+        if(nombre == answers['choices']):
+            nombres[x]['contra'] = answers['newName']
             break
-    print(nombres)
-    #remplazarlo en el json
-changeName()
+    data['passwords'] = nombres
+    #cambiar por el nombre del json
+    with open ('passwords.json', 'w') as file:
+        json.dump(data, file, indent=2)
