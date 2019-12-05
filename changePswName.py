@@ -6,11 +6,11 @@ class validateNew(Validator):
         newName = len(document.text)
         if not newName > 0:
             raise ValidationError(
-                message='El nuevo nombre no puede estar vacio',
+                message='la nueva contraseña no puede estar vacia',
                 cursor_position=len(document.text))
         if newName > 21:
             raise ValidationError(
-                message='El nuevo nombre es muy largo',
+                message='la nueva contraseña esta muy larga',
                 cursor_position=len(document.text))
 
 def Nombres(answers):
@@ -28,14 +28,14 @@ def changeName():
             'choices': Nombres
         },
         {
-            'type': 'input',
+            'type': 'password',
             'name': 'newName',
-            'message': 'Introduce el nuevo nombre',
+            'message': 'Introduce la nueva contraseña',
             'validate': validateNew
         }
     ]
     answers = prompt(questions)
-    #volver a agarrar los nombres del archivo json y meterlos a un arreglo
+    #volver a agarrar los nombres del archivo json pero esta vez con su contraseña y cambiar el valor de su contra
     nombres = ['PSW', 'mi favorita', 'la nueva', 'Imposible']
     for x in range(0,len(nombres)):
         if(nombres[x] == answers['choices']):
