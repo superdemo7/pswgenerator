@@ -6,7 +6,7 @@ import os.path
 #Archivos
 import installation
 import menu
-
+import json
 
 def main():
     if os.path.exists('config.json'):
@@ -18,7 +18,11 @@ def main():
             }
         ]
         pin = prompt(questions)
-        if pin['pass'] == "123":
+        with open('config.json') as file:
+            data = json.load(file)
+        for user in data['user']:
+            contra = user['psw']
+        if pin['pass'] == contra:
             menu.menu()
         else:
             print('El PIN ingresado es incorrecto')
