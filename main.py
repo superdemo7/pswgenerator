@@ -1,7 +1,6 @@
 #Librerias
 from __future__ import print_function, unicode_literals
 from PyInquirer import style_from_dict, Token, prompt, Separator
-import pyperclip
 import os.path
 import json
 import click
@@ -34,7 +33,7 @@ def main(action):
             else:
                 print('El PIN ingresado es incorrecto')
         elif action == "generate":
-            generate.createPswd()
+            generate.createPswd(timer)
         elif action == "nothing":
             print('Opciones disponibles: "list" para menu y "generate" para crear contraseña')
             timer.stop()
