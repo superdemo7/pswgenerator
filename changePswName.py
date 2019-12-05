@@ -4,9 +4,13 @@ from PyInquirer import Validator, ValidationError
 class validateNew(Validator):
     def validate(self, document):
         newName = len(document.text)
-        if not newName > 2:
+        if not newName > 0:
             raise ValidationError(
-                message='El nuevo nombre es muy corto',
+                message='El nuevo nombre no puede estar vacio',
+                cursor_position=len(document.text))
+        if newName > 21:
+            raise ValidationError(
+                message='El nuevo nombre es muy largo',
                 cursor_position=len(document.text))
 
 def Nombres(answers):
