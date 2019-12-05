@@ -1,20 +1,24 @@
 from PyInquirer import style_from_dict, Token, prompt, Separator
 from PyInquirer import Validator, ValidationError
 import json
-
+import menu
 def Nombres(answers):
     #buscar todos los nombres del archivo json y meterlos a un arreglo
-    with open('passwords.json') as file:
+    with open('config.json') as file:
         data = json.load(file)
         nombres = []
         for user in data['passwords']:
-            nombres.append(user['nombre'])
+            nombres.append(decrypt(data['secret'],bytes(user['nombre'],'latin-1')).decode('latin-1'))
+        nombres.append({
+            'name':'<--Volver',
+            'value':'exit'
+        })
     return nombres
 
-def borrarPswd():
-    with open('passwords.json') as file:
+def borrarPswd(timer):
+    with open('config.json') as file:
         data = json.load(file)
-    if(not data['passwords'] == []):
+    if(data['passwords']):
         questions = [
             {
                 'type': 'list',
@@ -24,27 +28,35 @@ def borrarPswd():
             },
         ]
         answers = prompt(questions)
-        with open('passwords.json') as file:
-            data = json.load(file)
-            nombres = []
-            for user in data['passwords']:
-                nombres.append(
-                    {
-                        "nombre": user['nombre'], 
-                        "contra": user['contra']
-                    })
+        try:
+            if answers['choices'] == 'exit':
+                menu.menu(timer)
+            else:
+                with open('config.json') as file:
+                    data = json.load(file)
+                    nombres = []
+                    for user in data['passwords']:
+                        nombres.append(
+                            {
+                                "nombre": user['nombre'], 
+                                "contra": user['contra']
+                            })
 
-        for x in range(0,len(nombres)):
-            nombre = nombres[x].get('nombre')
-            if(nombre == answers['choices']):
-                nombres.pop(x)
-                break
+                for x in range(0,len(nombres)):
+                    nombre = nombres[x].get('nombre')
+                    if(nombre == answers['choices']):
+                        nombres.pop(x)
+                        break
 
-        data['passwords'] = nombres
-        #cambiar por el nombre del json
-        with open ('passwords.json', 'w') as file:
-            json.dump(data, file, indent=2)
-        print(answers['choices']+ ' borrado satisfactoriamente junto con su contraseña')
-        print(nombres)
-
-borrarPswd()
+                data['passwords'] = nombres
+                #cambiar por el nombre del json
+                with open ('config.json', 'w') as file:
+                    json.dump(data, file, indent=2)
+                print(answers['choices']+ ' borrado satisfactoriamente junto con su contraseña')
+                print(nombres)
+                menu.menu(timer)
+        except KeyError:
+            pass
+    else:
+        print('No tienes ninguna contraseña archivada, agregala usando la opcion "generate"')
+        menu.menu(timer)

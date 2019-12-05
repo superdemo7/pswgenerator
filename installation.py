@@ -3,8 +3,9 @@ from PyInquirer import style_from_dict, Token, prompt, Separator
 from PyInquirer import Validator, ValidationError
 import regex
 import json
+import secrets
+import string
 import main
-
 class emailValidator(Validator):
     def validate(self, document):
         ok = regex.match('^[^@]+@[^@]+\.[a-zA-Z]{2,}$', document.text)
@@ -42,12 +43,16 @@ def install(timer):
         }
     ]
     answers = prompt(questions)
-    data = {}
-    data['user'] = []
-    data['user'].append({
-        'correo': answers['correo'],
-        'psw': answers['passw']
-    })
+    data = {
+        'user':[
+            {
+                'correo': answers['correo'],
+                'psw': answers['passw']
+            }
+        ],
+        'passwords':[],
+        'historial':[]
+    }
     with open ('config.json', 'w') as file:
         json.dump(data, file, indent=2)
     timer.restart()

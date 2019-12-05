@@ -26,6 +26,11 @@ class NameValidator(Validator):
                 message='El nombre no puede estar vacio',
                 cursor_position=len(document.text)
             )
+        elif document.text == 'exit':
+            raise ValidationError(
+                message='Este nombre esta reservado',
+                cursor_position=len(document.text)
+            )
         else:    
             with open('config.json', 'r') as json_config:
                 config = json_config.read()

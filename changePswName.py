@@ -1,7 +1,7 @@
 from PyInquirer import style_from_dict, Token, prompt, Separator
 from PyInquirer import Validator, ValidationError
 import json
-
+import menu
 class validateNew(Validator):
     def validate(self, document):
         newName = len(document.text)
@@ -16,15 +16,19 @@ class validateNew(Validator):
 
 def Nombres(answers):
     #cambiar por el nombre del json
-    with open('passwords.json') as file:
+    with open('config.json') as file:
         data = json.load(file)
         nombres = []
         for user in data['passwords']:
             nombres.append(user['nombre'])
+        nombres.append({
+            'name':'<--Volver',
+            'value':'exit'
+        })
     return nombres
 
 def uploadPswd(anterior, nombrePsw):
-    with open('historial.json') as file:
+    with open('config.json') as file:
         hist = json.load(file)
         names = []
         if(not hist == []):
@@ -61,11 +65,11 @@ def uploadPswd(anterior, nombrePsw):
             })
 
     hist['historial'] = names
-    with open ('historial.json', 'w') as file:
+    with open ('config.json', 'w') as file:
         json.dump(hist, file, indent=2)
 
-def changeName():
-    with open('passwords.json') as file:
+def changeName(timer):
+    with open('config.json') as file:
         data = json.load(file)
     if(not data['passwords'] == []):
         questions = [
@@ -79,33 +83,43 @@ def changeName():
                 'type': 'password',
                 'name': 'newName',
                 'message': 'Introduce la nueva contraseña',
-                'validate': validateNew
+                'validate': validateNew,
+                'when':lambda answers: answers['choices'] != 'exit'
             }
         ]
         answers = prompt(questions)
-        #cambiar por el nombre del json
-        with open('passwords.json') as file:
-            data = json.load(file)
-            nombres = []
-            for user in data['passwords']:
-                nombres.append(
-                    {
-                        "nombre": user['nombre'], 
-                        "contra": user['contra']
-                    })
+        try:
+            if answers['choices'] == 'exit':
+                menu.menu(timer)
+            else:
+                #cambiar por el nombre del json
+                with open('config.json') as file:
+                    data = json.load(file)
+                    nombres = []
+                    for user in data['passwords']:
+                        nombres.append(
+                            {
+                                "nombre": user['nombre'], 
+                                "contra": user['contra']
+                            })
 
-        for x in range(0,len(nombres)):
-            nombre = nombres[x].get('nombre')
-            if(nombre == answers['choices']):
-                anteriorPswd = nombres[x]['contra']
-                nombres[x]['contra'] = answers['newName']
-                break
+                for x in range(0,len(nombres)):
+                    nombre = nombres[x].get('nombre')
+                    if(nombre == answers['choices']):
+                        anteriorPswd = nombres[x]['contra']
+                        nombres[x]['contra'] = answers['newName']
+                        break
 
-        data['passwords'] = nombres
-        #cambiar por el nombre del json
-        with open ('passwords.json', 'w') as file:
-            json.dump(data, file, indent=2)
-
-        uploadPswd(anteriorPswd, answers['choices'])
-
-changeName()
+                data['passwords'] = nombres
+                #cambiar por el nombre del json
+                with open ('config.json', 'w') as file:
+                    json.dump(data, file, indent=2)
+                print('Actualizando...')
+                uploadPswd(anteriorPswd, answers['choices'])
+                print('Actualizado!')
+                menu.menu(timer)
+        except KeyError:
+            pass
+    else:
+        print('No tienes ninguna contraseña archivada, agregala usando la opcion "generate"')
+        menu.menu(timer)

@@ -4,7 +4,7 @@ from PyInquirer import style_from_dict, Token, prompt, Separator
 import os.path
 import json
 import click
-
+from simplecrypt import decrypt
 #Archivos
 import installation
 import menu
@@ -19,6 +19,7 @@ def main(action):
             questions = [
                 {
                     'type': 'password',
+                    'qmark':'#',
                     'name': 'pass',
                     'message': 'Ingresa tu PIN',
                 }
@@ -29,9 +30,10 @@ def main(action):
             for user in data['user']:
                 contra = user['psw']
             if pin['pass'] == contra:
-                menu.menu()
+                menu.menu(timer)
             else:
                 print('El PIN ingresado es incorrecto')
+                timer.stop()
         elif action == "generate":
             generate.createPswd(timer)
         elif action == "nothing":
