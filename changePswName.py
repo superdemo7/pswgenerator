@@ -20,8 +20,49 @@ def Nombres(answers):
         data = json.load(file)
         nombres = []
         for user in data['passwords']:
-            nombres.append(user['name'])
+            nombres.append(user['nombre'])
     return nombres
+
+def uploadPswd(anterior, nombrePsw):
+    with open('historial.json') as file:
+        hist = json.load(file)
+        names = []
+        if(not hist == []):
+            for nombre in hist['historial']:
+                names.append({
+                    "name": nombre['name'],
+                    "historial": nombre['historial']
+                })
+            cambiado = False
+            #si habia cambiado anteriormente la contra
+            for x in range(0,len(names)):
+                if(names[x]['name'] == nombrePsw):
+                    names[x]['historial'].append({ "psw": anterior })
+                    cambiado = True
+                    break
+            #Si nunca habia cambiado la contra
+            if(not cambiado):
+                names.append({
+                    "name": nombrePsw,
+                    "historial": [
+                        {
+                            "psw": anterior
+                        }
+                    ]
+                })
+        else:
+            names.append({
+                "name": nombrePsw,
+                "historial": [
+                    {
+                        "psw": anterior
+                    }
+                ]
+            })
+
+    hist['historial'] = names
+    with open ('historial.json', 'w') as file:
+        json.dump(hist, file, indent=2)
 
 def changeName():
     questions = [
@@ -46,16 +87,20 @@ def changeName():
         for user in data['passwords']:
             nombres.append(
                 {
-                    "nombre": user['name'], 
-                    "contra": user['psw']
+                    "nombre": user['nombre'], 
+                    "contra": user['contra']
                 })
 
     for x in range(0,len(nombres)):
         nombre = nombres[x].get('nombre')
         if(nombre == answers['choices']):
+            anteriorPswd = nombres[x]['contra']
             nombres[x]['contra'] = answers['newName']
             break
+
     data['passwords'] = nombres
     #cambiar por el nombre del json
     with open ('passwords.json', 'w') as file:
         json.dump(data, file, indent=2)
+
+    uploadPswd(anteriorPswd, answers['choices'])
