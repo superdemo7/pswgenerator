@@ -25,7 +25,8 @@ class passValidator(Validator):
                 message='Porfavor introduce una contraseña de puros caracteres numericos',
                 cursor_position=len(document.text))
 
-def install():
+def install(timer):
+    timer.pause()
     questions = [
         {
             'type': 'input',
@@ -49,5 +50,5 @@ def install():
     })
     with open ('config.json', 'w') as file:
         json.dump(data, file, indent=2)
+    timer.restart()
     main.main()
-    print('instalando...')
